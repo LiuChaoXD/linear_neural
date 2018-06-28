@@ -88,6 +88,10 @@ def softmax(z):
     total = np.sum(np.exp(z),axis=0,keepdims=True)
     s = np.exp(z)/total
     return s
+
+'''
+定义前向传播函数，并且返回每一层当中激活函数的输出
+'''
 def forward_propagation(input_x,output_y,parameters):
     m = input_x.shape[1]
     w1 = parameters["w1"]
@@ -98,6 +102,9 @@ def forward_propagation(input_x,output_y,parameters):
     a2 = softmax(np.dot(w2,a1)+b2)
     value_cost = -1/m*np.sum(output_y*np.log(a2))
     return a1,a2,value_cost
+'''
+定义后向传播过程
+'''
 def backward_propagation(input_x,output_y,parameters,learning_rate,iterations):
     m = input_x.shape[1]
     w1 = parameters["w1"]
@@ -120,7 +127,18 @@ def backward_propagation(input_x,output_y,parameters,learning_rate,iterations):
         assert (b1.shape==db1.shape)
         assert (w2.shape==dw2.shape)
         assert (b2.shape==db2.shape)
-        y_predict = np.eye(10)[np.array(a2.argmax(0))].T
+        y_predict = np.eye(10)[np.array(a2.argmax(0))].T        ##这是用与one-hot编码
+        '''
+                np.eye(3)  ---------->    [1,0,0]
+                                          [0,1,0]
+                                          [0,0,1]
+                np.eye(3)[i]会将生成的对角矩阵的第i行取出
+                
+                因此:
+                    np.eye(10)[np.array(a2.argmax(0))]会生成，每行对应一个0-9之间的数字
+                    转制之后，即为one-hot编码形式，每列对应0-9之间的一个数字
+        
+        '''
         acc = 1-np.sum(np.abs(y_predict-output_y))/m
         if i%100==0:
             print("cost after iteration %i: %f"%(i,cost))
